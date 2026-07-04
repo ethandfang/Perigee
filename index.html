@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Near-Earth Swarm</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="overlay"></canvas>
+
+<!-- ============ HEADER ============ -->
+<header class="hero">
+  <div class="eyebrow">NASA/JPL SMALL-BODY DATABASE&nbsp;&nbsp;·&nbsp;&nbsp;SNAPSHOT PULLED 2026-07-04</div>
+  <h1>The Near-Earth Swarm</h1>
+  <p class="lede">All <strong class="accent" id="ledePha">2,545 known potentially hazardous asteroids</strong> plus the <strong id="ledeOther">1,511</strong> largest other near-Earth asteroids — each moving on its real orbit, computed from JPL's full-precision orbital elements. Click any dot.</p>
+  <div class="chips">
+    <span class="chip" id="chipPlotted">4,056 plotted</span>
+    <span class="chip" id="chipPha">2,545 PHAs — all of them</span>
+    <span class="chip" id="chipTotal">of 41,945 known NEOs</span>
+    <span class="chip" id="chipCad">229 close passes to 2033</span>
+  </div>
+</header>
+
+<!-- ============ TOP RIGHT CONTROLS ============ -->
+<div class="top-right">
+  <button class="method-btn" id="btnMethod"><span class="info-i">i</span> Data &amp; method</button>
+  <div class="segmented" id="orbitMode">
+    <button class="seg-btn active" data-mode="all">All orbits</button>
+    <button class="seg-btn" data-mode="pha">Hazardous</button>
+    <button class="seg-btn" data-mode="none">Hide</button>
+  </div>
+  <div class="frame-toggle" id="frameToggle">
+    <button class="frame-btn active" data-frame="sun"><span class="frame-glyph">☉</span> Sun</button>
+    <button class="frame-btn" data-frame="earth"><span class="frame-glyph">⊕</span> Earth</button>
+  </div>
+</div>
+
+<!-- ============ RIGHT DETAIL PANEL ============ -->
+<aside class="detail-panel hidden" id="detailPanel">
+  <button class="panel-chevron" id="panelChevron" title="Collapse">⌃</button>
+  <div class="detail-head">
+    <h2 id="dTitle">—</h2>
+    <div class="detail-sub" id="dSub">—</div>
+    <div class="tags" id="dTags"></div>
+  </div>
+  <div class="panel-body" id="panelBody">
+    <div class="section">
+      <div class="section-label" id="dElemLabel">OSCULATING ELEMENTS</div>
+      <div class="kv" id="dElems"></div>
+    </div>
+    <div class="section">
+      <div class="section-label">PHYSICAL</div>
+      <div class="kv" id="dPhys"></div>
+    </div>
+    <div class="section">
+      <div class="section-label right-now">RIGHT NOW (SIM TIME)</div>
+      <div class="kv" id="dNow"></div>
+    </div>
+    <p class="footnote">Elements: JPL Small-Body Database (full precision), snapshot pulled 2026-07-04. Motion on this page is a two-body propagation from the epoch above — see Data &amp; method.</p>
+  </div>
+</aside>
+
+<!-- ============ CLOSE APPROACHES PANEL ============ -->
+<aside class="approach-panel" id="approachPanel">
+  <div class="ap-head">
+    <div class="ap-title">UPCOMING CLOSE<br>APPROACHES</div>
+    <div class="ap-meta" id="apMeta">229 known ·<br>&lt;0.02 au</div>
+  </div>
+  <div class="ap-list" id="apList"></div>
+  <p class="ap-foot">Known future passes within 0.02 au (7.8 lunar distances), per JPL CNEOS. Most very close passes are by small rocks found only days ahead — the future catalog is sparse by nature. Click a row to watch its approach.</p>
+</aside>
+
+<!-- ============ BOTTOM BAR ============ -->
+<div class="bottom-bar">
+  <button class="play-btn" id="btnPlay" title="Play / pause">
+    <svg id="iconPause" width="14" height="14" viewBox="0 0 14 14"><rect x="2.2" y="1.5" width="3.2" height="11" rx="1"/><rect x="8.6" y="1.5" width="3.2" height="11" rx="1"/></svg>
+    <svg id="iconPlay" width="14" height="14" viewBox="0 0 14 14" style="display:none"><path d="M3 1.6v10.8c0 .8.9 1.3 1.6.9l8-5.4c.6-.4.6-1.4 0-1.8l-8-5.4C3.9.3 3 .8 3 1.6z"/></svg>
+  </button>
+  <button class="speed-btn" id="btnSpeed">▸ 1 wk/s</button>
+  <div class="sim-date" id="simDate">Jul 04, 2026</div>
+  <div class="scrubber">
+    <input type="range" id="timeline" min="0" max="10000" value="0" step="1">
+  </div>
+  <button class="jump-btn" id="btnToday">Today</button>
+  <button class="event-pill" id="btnApophis">Apophis · Apr 2029</button>
+  <button class="event-pill" id="btnYR4">2024 YR4 · Dec 2032</button>
+</div>
+
+<!-- ============ LEGEND ============ -->
+<div class="legend">
+  <span class="legend-item"><span class="dot dot-pha"></span> Potentially hazardous</span>
+  <span class="legend-item"><span class="dot dot-neo"></span> Other NEO</span>
+</div>
+
+<!-- ============ TOOLTIP ============ -->
+<div class="tooltip hidden" id="tooltip">
+  <div class="tt-des" id="ttDes"></div>
+  <div class="tt-tags" id="ttTags"></div>
+  <div class="tt-delta" id="ttDelta"></div>
+</div>
+
+<!-- ============ METHOD MODAL ============ -->
+<div class="modal-backdrop hidden" id="methodModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h3>Data &amp; method</h3>
+    <div class="modal-body">
+      <p><strong>Sources.</strong> Orbital elements and physical parameters are a one-time snapshot from the <em>JPL Small-Body Database Query API</em>, pulled 2026-07-04 at full precision. The close-approach list comes from the <em>JPL CNEOS Close-Approach Data API</em> (all known passes within 0.02 au through the end of 2033). Nothing on this page phones home — the dataset is a static file committed with the site.</p>
+      <p><strong>What's plotted.</strong> Every potentially hazardous asteroid in the catalog, plus the largest other near-Earth asteroids ranked by absolute magnitude H. A PHA is defined as an object with Earth MOID ≤ 0.05 au and H ≤ 22.0.</p>
+      <p><strong>Motion.</strong> Each object's position is computed live in your browser by two-body Keplerian propagation from its osculating elements at the catalog epoch: Kepler's equation is solved by Newton–Raphson for the eccentric anomaly, converted to true anomaly, and rotated into heliocentric ecliptic coordinates via the standard i/Ω/ω rotation. Planetary positions use JPL's approximate mean elements (1800–2050).</p>
+      <p><strong>Caveats.</strong> Two-body propagation ignores planetary perturbations, so positions drift from truth over years — fine for a sky-wide picture, not for navigation. Close-approach dates and distances in the list are JPL's own solutions, not this page's propagation. 1 lunar distance (LD) ≈ 0.002569 au ≈ 384,400 km.</p>
+      <p><strong>Refresh.</strong> Re-running <span class="mono">scripts/fetch_data.mjs</span> re-pulls the catalog and overwrites the snapshot.</p>
+    </div>
+  </div>
+</div>
+
+<div class="vignette"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
