@@ -1,11 +1,11 @@
-# The Near-Earth Swarm
+# Earth Swarm
 
 A full-screen visualizer of near-Earth asteroids: every known potentially hazardous
 asteroid plus the largest other NEOs, each moving on its real orbit via two-body
 Keplerian propagation computed live in the browser from JPL's full-precision
 orbital elements.
 
-![The Near-Earth Swarm — 4,056 asteroids on their real orbits](docs/screenshot.jpg)
+![Earth Swarm — 4,056 asteroids on their real orbits](docs/screenshot.jpg)
 
 ## Run locally
 
@@ -36,9 +36,6 @@ The "potentially hazardous" classification (Earth MOID ≤ 0.05 au and H ≤ 22.
 follows [CNEOS's definition](https://cneos.jpl.nasa.gov/about/neo_groups.html).
 
 ## Data snapshot
-
-One-time snapshot pulled 2026-07-04 from the APIs above, committed as
-static JSON in `data/`:
 
 - `neos.json` — orbital elements + physical parameters for all PHAs and the
   largest other NEOs (Small-Body Database Query API)
