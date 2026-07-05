@@ -15,6 +15,7 @@ Any static file server works (ES modules require http, not file://):
 python3 -m http.server 8137
 # then open http://localhost:8137
 ```
+...or click my github pages above!
 
 ## Data sources
 
