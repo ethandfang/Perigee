@@ -57,4 +57,5 @@ node scripts/fetch_data.mjs
 - `js/main.js` — simulation loop, camera, picking, UI
 - `css/style.css` — dark theme, SF Pro system font stack
 
-
+## Note
+Best read on a computer; not optimized for mobile viewing
